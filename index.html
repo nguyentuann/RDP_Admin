@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./assets/main.css">
+  <link rel="stylesheet" href="./assets/base.css">
+  <title>Remote Desktop Admin</title>
+</head>
+
+<body>
+  <div class="main-container">
+    
+  </div>
+
+  <div class="login-container">
+    <div class="login-content">
+      <h2>Đăng Nhập</h2>
+      <form method="get" id="loginForm">
+        <div class="form__group">
+          <label for="username">Tên đăng nhập:</label>
+          <input type="text" id="username" name="username" required placeholder="Tên đăng nhập" value="admin@gmail.com">
+        </div>
+        <div class="form__group">
+          <label for="password">Mật khẩu:</label>
+          <input type="password" id="password" name="password" required placeholder="Mật khẩu" value="admin">
+        </div>
+        <span class="login-message"></span>
+        <button type="submit" class="btn btn--login" onclick="ValidateLogin(event)">Đăng Nhập</button>
+      </form>
+    </div>
+  </div>
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" crossorigin="anonymous"></script>
+  <script src="./index.js"></script>
+  <script src="./callapi.js"></script>
+  <script src="./upd_control/receiveScreens.js"></script>
+  <script src="http://192.168.1.31:3000/socket.io/socket.io.js"></script>
+  
+</body>
+</html>

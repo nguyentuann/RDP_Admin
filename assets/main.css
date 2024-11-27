@@ -1,0 +1,157 @@
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: rgb(36, 36, 36);
+}
+
+body {
+  background-color: rgb(241, 241, 241);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+
+
+.btn {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.header {
+  display: flex;
+  gap: 50px;
+  justify-content: right;
+  align-items: center;
+  background-color: rgb(38, 38, 38);
+  height: 60px;
+  top: 0;
+  padding-right: 20px;
+}
+
+.footer {
+  bottom: 0;
+}
+
+.main-content {
+  /* margin: 50px 0; */
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  justify-content: space-evenly;
+}
+
+.screen {
+  width: calc(33.33% - 10px);
+  aspect-ratio: 16 / 9; 
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #c9c9c9;
+}
+
+/* Media query cho màn hình nhỏ hơn */
+@media (max-width: 1000px) {
+  .screen {
+    width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 500px) {
+  .screen {
+    width: 100%;
+  }
+}
+
+.screen--focus {
+  width: 1180px;
+  border: 1px solid red;
+}
+
+
+.screen__img {
+  width: 100%;
+  height: 100%;
+}
+
+/* form đăng nhập */
+.login-container {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+}
+
+.login-content {
+  background: rgb(192, 208, 213);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  width: 500px;
+  margin: auto;
+ 
+}
+
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: large;
+}
+
+.form__group {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: medium;
+}
+
+#username, #password {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: medium;
+}
+
+.btn--login {
+  margin: 10px 30%;
+  font-size: medium;
+}
+
+.form__group.invalid #username,
+.form__group.invalid #password{
+  border-color: #f33a58;
+}
+
+.login-message.invalid {
+  font-size: medium;
+  color: #f33a58;
+  text-align: center;
+}

@@ -1,0 +1,267 @@
+/* CSS chung */
+body {
+  position: relative;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+#unit {
+  height: 34px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+
+.btn {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn:hover {
+  background-color: #218838;
+}
+
+/* Xong CSS chung */
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  font-size: 24px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.header div {
+  margin-right: auto;
+}
+
+.search__container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Khoảng cách giữa select và input */
+}
+
+.search__option {
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  border: none;
+}
+
+
+.header .search {
+  width: 250px;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: none;
+}
+
+.btn--add {
+  padding: 8px 16px;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-right: 40px;
+}
+
+.btn--add:hover {
+  background-color: #218838;
+}
+/* Xong CSS Header */
+
+
+/* CSS nội dùng hiển thị */
+
+.content {
+  display: flex;
+  padding: 60px 20px 20px 20px;
+}
+
+
+/* Infor */
+.content__infor {
+  width: 100%;
+}
+
+.content__infor table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content__infor th,
+.content__infor td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  height: 100%;
+}
+.content__infor th {
+  cursor: pointer;
+}
+.content__infor th:first-child {
+  cursor: default;
+}
+
+
+/* Header infor */
+.infor__header th {
+  margin-top: 80px;
+  background-color: #007bff;
+  color: white;
+  font-weight: normal;
+}
+
+/* Body infor */
+
+.infor__body tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Hành động */
+.infor__body .body__action {
+  border: none;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100%;
+}
+
+/* Xong CSS nội dùng hiển thị */
+
+/* CSS Form thay doi thong tin */
+
+.form__edit {
+  display: none;
+  overflow-y: auto;
+}
+
+.content__form {
+  position: fixed;
+  z-index: 10000;
+  width: 100vw;
+  height: 100vh;
+  padding: 0 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.content__form form {
+  width: 500px;
+  background-color: #fff;
+  padding: 30px 20px 20px 20px;
+  border: 1px solid #dbdada;
+  border-radius: 5px;
+  box-shadow: -2px 5px 10px #595959
+}
+
+.header__form {
+  text-align: center;
+}
+
+/* Group từng trường */
+.form__group {
+  margin-bottom: 15px;
+}
+
+/* Label cho các trường */
+.form__label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Input cho các trường */
+input[type="text"],
+input[type="email"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Định dạng readonly */
+input[readonly] {
+  background-color: #f0f0f0;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.form__btn {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.form__group.invalid .form__control {
+  border-color: #f33a58;
+}
+
+.form__group.invalid .form-message {
+  color: #f33a58;
+  font-size: 12px;
+}
+/* Xong CSS Form thay doi thong tin */
+
+/* Css cho quản lý phòng ban */
+.column--action {
+  width: 12%;
+}
+.column--id {
+  width: 12%;
+}
+
+
+
+/* Xong CSS cho quản lý phòng ban */
+
+/* CSS cho quản lý thông báo */
+
+.chart {
+  flex-direction: column;
+  margin-top: 100px;
+  width: 100%;
+  height: 500px;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+#myChart {
+  margin-bottom: 20px;
+  width: 800px;
+  height: 400px;
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý phòng ban</title>
+  <link rel="stylesheet" href="../quanlychitiet.css">
+  <link rel="stylesheet" href="../../fontawesome/fontawesome-free-6.6.0-web/fontawesome-free-6.6.0-web/css/all.min.css">
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <div class="form__edit">
+    <div class="content__form">
+      <form action="" method="get" id="form">
+        <div>
+          <h2 class="header__form">Thay đổi thông tin phòng ban</h2>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="id">Mã Phòng Ban</label>
+          <input type="text" class ="form__control" id="id" name="id" readonly>
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="name">Tên phòng ban</label>
+          <input type="text" class ="form__control" id="name" name="name"  rules = "required" readonly>
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group form__btn">
+          <button class="btn btn--exit" onclick="exitEditForm(event)">Hủy bỏ</button>
+          <button class="btn btn--ok">Xác nhận</button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+
+
+
+  <div class="container">
+    <!-- thanh header -->
+    <div class="header">
+      <div>Phòng ban</div>
+      <div class="search__container">
+        <input type="text" name="search" id="search" class="search" placeholder="Nhập tên phòng ban">
+        <button class="btn btn--search" onclick="searchDepartments()">Tìm</button>
+      </div>
+      <input type="button" class=" btn btn--add" id="" value="Thêm mới" onclick="addDepartment()">
+    </div>
+
+    <!-- container -->
+    <div class="content">
+
+      <!-- infor -->
+      <div class="content__infor">
+        <table>
+          <!-- header infor -->
+          <thead class="infor__header">
+            <tr>
+              <th class="column--action">Hành động</th>
+              <th onclick="sortDepartments('id')" class="column--id">Mã phòng ban</th>
+              <th onclick="sortDepartments('name')" class="column--name">Tên phòng ban</th>
+            </tr>
+          </thead>
+          <!-- content infor -->
+          <tbody class="infor__body">
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="../../callapi.js"></script>
+  <script src="../validateForm.js"></script>
+  <script src="quanlyphongban.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+</body>
+
+</html>

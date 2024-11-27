@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý thông báo</title>
+  <link rel="stylesheet" href="../quanlychitiet.css">
+  <link rel="stylesheet" href="../../fontawesome/fontawesome-free-6.6.0-web/fontawesome-free-6.6.0-web/css/all.min.css">
+  <style>
+
+  </style>
+</head>
+
+<body>
+
+
+  <div class="container">
+    <!-- thanh header -->
+    <div class="header">
+      <div>Thông báo</div>
+      <div class="search__container">
+        <select id="searchOption" class="search__option">
+          <option value="idEmp">Mã nhân viên</option>
+          <option value="name">Nội dung</option>
+        </select>
+        <input type="text" name="search" id="search" class="search" placeholder="Nhập nội dùng tìm kiếm">
+        <button class="btn btn--search" onclick="searchNotifi()">Tìm</button>
+      </div>
+      <select id="chartOption" class="search__option">
+        <option value="emp">Xem theo nhân viên</option>
+        <option value="error">Xem theo lỗi</option>
+      </select>
+      <div style="margin-right: 10px;"></div>
+      <input type="button" class=" btn btn--chart btn--add" id="" value="Xem biểu đồ" onclick="chart()">
+    </div>
+
+    <!-- container -->
+    <div class="content">
+
+      <!-- infor -->
+      <div class="content__infor">
+        <table>
+          <!-- header infor -->
+          <thead class="infor__header">
+            <tr>
+              <th class="column--action">Hành động</th>
+              <th onclick="sortNotifis('id')" class="column--id">Mã thông báo</th>
+              <th onclick="sortNotifis('idEmp')" class="column--idEmp">Mã nhân viên</th>
+              <th onclick="sortNotifis('content')" class="column--content">Nội dung thông báo</th> <!-- Thêm sự kiện click -->
+
+            </tr>
+          </thead>
+          <!-- content infor -->
+          <tbody class="infor__body">
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+    <!-- biểu đồ -->
+    <div class="chart">
+      <canvas id="myChart"  width="400" height="400"></canvas>
+      <button class= "btn" onclick="exitChart()">Trở lại</button>
+    </div>
+    
+  <script src="../../callapi.js"></script>
+  <script src="../validateForm.js"></script>
+  <script src="./quanlythongbao.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+
+</html>

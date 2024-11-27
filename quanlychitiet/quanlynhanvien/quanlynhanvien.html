@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý nhân viên</title>
+  <link rel="stylesheet" href="../quanlychitiet.css">
+  <link rel="stylesheet" href="../../fontawesome/fontawesome-free-6.6.0-web/fontawesome-free-6.6.0-web/css/all.min.css">
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <div class="form__edit">
+    <div class="content__form">
+      <form action="" method="get" id="form">
+        <div>
+          <h2 class="header__form">Thay đổi thông tin nhân viên</h2>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="id">Mã Nhân Viên</label>
+          <input type="text" class="form__control" id="id" name="id" readonly>
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="name">Họ và tên</label>
+          <input type="text" class="form__control" id="name" name="name" rules="required" readonly>
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="email">Email</label>
+          <input type="email" class="form__control" id="email" name="email" rules="required|email" readonly>
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="password">Mật khẩu</label>
+          <input type="text" class="form__control" id="password" name="password" rules="required|min:6">
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="department">Phòng ban</label>
+          <select name="department" id="department"></select>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="jobTitle">Công việc</label>
+          <input type="text" class="form__control" id="jobTitle" name="jobTitle" rules="required">
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="companyName">Công ty</label>
+          <input type="text" class="form__control" name="companyName" id="companyName" rules="required">
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group form__btn">
+          <button class="btn btn--exit" onclick="exitEditForm(event)">Hủy bỏ</button>
+          <button class="btn btn--ok">Xác nhận</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <div class="container">
+    <!-- thanh header -->
+    <div class="header">
+      <div>Nhân viên</div>
+      <div class="search__container">
+        <select id="searchOption" class="search__option">
+          <option value="name">Tên nhân viên</option>
+          <option value="department">Phòng ban</option>
+        </select>
+        <input type="text" name="search" id="search" class="search" placeholder="Nhập nội dùng tìm kiếm" >
+        <button class="btn btn--search" onclick="searchEmployees()">Tìm</button>
+      </div>
+      <input type="button" class=" btn btn--add" id="" value="Thêm mới" onclick="addEmployee()">
+    </div>
+
+    <!-- container -->
+    <div class="content">
+
+      <!-- infor -->
+      <div class="content__infor">
+        <table>
+          <!-- header infor -->
+          <thead class="infor__header">
+            <tr>
+              <th class="column--action">Hành động</th>
+              <th onclick="sortEmployees('id')"class="column--id">Mã nhân viên</th>
+              <th onclick="sortEmployees('name')">Họ và tên</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('email')">Email</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('password')">Mật khẩu</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('unit')">Đơn vị</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('part')">Bộ phận</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('position')">Chức vụ</th> <!-- Thêm sự kiện click -->
+            </tr>
+          </thead>
+          <!-- content infor -->
+          <tbody class="infor__body">
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="../../callapi.js"></script>
+  <script src="../validateForm.js"></script>
+  <script src="./quanlynhanvien.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+</body>
+
+</html>
