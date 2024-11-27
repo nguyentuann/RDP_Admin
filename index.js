@@ -1,6 +1,8 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
-
+const btnLogin = $('#btn-login');
+btnLogin.addEventListener('click', (event) => ValidateLogin(event));
+import { login } from "./fecthAPI.js";
 
 const app = {
   screenFocus: function () {
@@ -13,7 +15,7 @@ const app = {
           }
         });
         screen.classList.add('screen--focus');
-        // addEventListenersToFocusedScreen();
+        addEventListenersToFocusedScreen();
       };
     });
   },
@@ -24,7 +26,7 @@ const app = {
     const screenDiv = document.createElement('div');
     screenDiv.classList.add('screen');
     screenDiv.setAttribute('tabindex', '0');
-    screenDiv.innerHTML = `<video class="screen__img screen__${id}" autoplay playsinline> </video>`;
+    screenDiv.innerHTML = `<video class="screen__img screen__${id}" autoplay playsinline "> </video>`;
 
     // Tìm container và thêm màn hình vào trong container
     const container = $('.container');
@@ -55,13 +57,15 @@ const app = {
 };
 
 // xác thức form đăng nhập 
-
-async function ValidateLogin(event) {
+export default async function ValidateLogin(event) {
+  console.log(event)
   event.preventDefault();
   const username = $('#username').value.trim();
   const password = $('#password').value.trim();
+ 
   try {
     // const data = await allApi.login(username, password, `authentication/login`);
+    const data = await login({username, password})
 
     if (1) {
       renderContent();
