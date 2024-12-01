@@ -1,6 +1,6 @@
 
 
-const ipServer = 'http://192.168.34.76:8088';
+const ipServer = 'http://192.168.33.113:8869/';
 
 async function fetchAPI(endpoint, options) {
     const url = `${ipServer}${endpoint}`;
@@ -37,71 +37,145 @@ async function fetchAPI(endpoint, options) {
 
     return response.json();
 }
-async function login(user) {
-    const options = {
-        method: "POST",
-        headers: {
-            "Cache-Control": "no-cache",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-    };
-    return fetchAPI('/rdp/api/v1/authentication/login', options);
+
+
+// Hàm đăng nhập
+async function login(username, password, table) {
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        };
+        const responseData = await fetchAPI(`${table}`, options);
+        const token = responseData?.data?.token;
+        if (!token) {
+            throw new Error('Token không tồn tại trong phản hồi từ server');
+        }
+        localStorage.setItem('jwtToken', token);
+        return responseData;
+    } catch (error) {
+        console.error('Lỗi khi đăng nhập:', error.message);
+        return null;
+    }
 }
 
-async function fetchUserInfo(token, userId) {
-    const options = {
-        method: "GET",
-        headers: {
-            "Cache-Control": "no-cache",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-    };
-    return fetchAPI(`/rdp/api/v1/users/user/${userId}`, options);
+// Hàm đăng xuất
+async function logout(table) {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        console.error('Không tìm thấy token để đăng xuất');
+        return null;
+    }
+
+    try {
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({token})
+        };
+        const responseData = await fetchAPI(`${table}`, options);
+        localStorage.removeItem('jwtToken');
+        return responseData;
+    } catch (error) {
+        console.error('Lỗi khi đăng xuất:', error.message);
+        return null;
+    }
 }
 
-async function updateUserInfo(token, userId, userData) {
-    const options = {
-        method: "PUT",
-        headers: {
-            "Cache-Control": "no-cache",
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(userData),
-    };
-    return fetchAPI(`/rdp/api/v1/users/user/${userId}`, options);
+// Hàm lấy dữ liệu
+async function fetchData(table) {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const options = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const data = await fetchAPI(`${table}`, options);
+        return data;
+    } catch (error) {
+        console.error('Lỗi:', error.message);
+        return null;
+    }
 }
 
-async function exitDepartment(token, idnv, mapb) {
-    const options = {
-        method: "POST",
-        headers: {
-            "Cache-Control": "no-cache",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-    };
-    return fetchAPI(`/rdp/api/v1/users/user/leave/${idnv}/${mapb}`, options);
+// Hàm thêm dữ liệu
+async function addData(table, newData) {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(newData)
+        };
+        const data = await fetchAPI(`${table}`, options);
+        return data;
+    } catch (error) {
+        console.error('Lỗi:', error.message);
+        return null;
+    }
 }
 
-async function joinDepartment(token, idnv, mapb) {
-    const options = {
-        method: "POST",
-        headers: {
-            "Cache-Control": "no-cache",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-        },
-    };
-    return fetchAPI(`/rdp/api/v1/users/user/join/${idnv}/${mapb}`, options);
+// Hàm cập nhật dữ liệu
+async function updateData(table, id, updatedData) {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        const options = {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedData)
+        };
+        const data = await fetchAPI(`${table}/${id}`, options);
+        return data;
+    } catch (error) {
+        console.error('Lỗi:', error.message);
+        return null;
+    }
 }
 
-export {
+// Hàm xóa dữ liệu
+async function deleteData(table, id) {
+    try {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            throw new Error('Token không hợp lệ');
+        }
+
+        const options = {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        };
+        const responseData = await fetchAPI(`${table}/${id}`, options);
+        console.log('Xóa dữ liệu thành công');
+        return responseData;
+    } catch (error) {
+        console.error('Lỗi:', error.message);
+        return false;
+    }
+}
+
+const allApi  = {
     login,
-    fetchUserInfo,
-    updateUserInfo,
-    exitDepartment,
-    joinDepartment,
+    logout,
+    fetchData,
+    addData,
+    updateData,
+    deleteData
 };

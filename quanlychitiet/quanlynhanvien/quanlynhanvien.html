@@ -19,16 +19,12 @@
         <div>
           <h2 class="header__form">Thay đổi thông tin nhân viên</h2>
         </div>
-        <div class="form__group">
+        <!-- <div class="form__group">
           <label class="form__label" for="id">Mã Nhân Viên</label>
           <input type="text" class="form__control" id="id" name="id" readonly>
           <span class="form-message"></span>
-        </div>
-        <div class="form__group">
-          <label class="form__label" for="name">Họ và tên</label>
-          <input type="text" class="form__control" id="name" name="name" rules="required" readonly>
-          <span class="form-message"></span>
-        </div>
+        </div> -->
+
         <div class="form__group">
           <label class="form__label" for="email">Email</label>
           <input type="email" class="form__control" id="email" name="email" rules="required|email" readonly>
@@ -40,8 +36,9 @@
           <span class="form-message"></span>
         </div>
         <div class="form__group">
-          <label class="form__label" for="department">Phòng ban</label>
-          <select name="department" id="department"></select>
+          <label class="form__label" for="name">Họ và tên</label>
+          <input type="text" class="form__control" id="name" name="name" rules="required" readonly>
+          <span class="form-message"></span>
         </div>
         <div class="form__group">
           <label class="form__label" for="jobTitle">Công việc</label>
@@ -70,9 +67,9 @@
       <div class="search__container">
         <select id="searchOption" class="search__option">
           <option value="name">Tên nhân viên</option>
-          <option value="department">Phòng ban</option>
+          <option value="email">Phòng ban</option>
         </select>
-        <input type="text" name="search" id="search" class="search" placeholder="Nhập nội dùng tìm kiếm" >
+        <input type="text" name="search" id="search" class="search" placeholder="Nhập nội dùng tìm kiếm">
         <button class="btn btn--search" onclick="searchEmployees()">Tìm</button>
       </div>
       <input type="button" class=" btn btn--add" id="" value="Thêm mới" onclick="addEmployee()">
@@ -88,13 +85,12 @@
           <thead class="infor__header">
             <tr>
               <th class="column--action">Hành động</th>
-              <th onclick="sortEmployees('id')"class="column--id">Mã nhân viên</th>
-              <th onclick="sortEmployees('name')">Họ và tên</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('id')" class="column--id">Mã nhân viên</th>
               <th onclick="sortEmployees('email')">Email</th> <!-- Thêm sự kiện click -->
               <th onclick="sortEmployees('password')">Mật khẩu</th> <!-- Thêm sự kiện click -->
-              <th onclick="sortEmployees('unit')">Đơn vị</th> <!-- Thêm sự kiện click -->
-              <th onclick="sortEmployees('part')">Bộ phận</th> <!-- Thêm sự kiện click -->
-              <th onclick="sortEmployees('position')">Chức vụ</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('name')">Họ và tên</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('jobTitle')">Công việc</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('companyName')">Công ty</th> <!-- Thêm sự kiện click -->
             </tr>
           </thead>
           <!-- content infor -->
@@ -105,7 +101,7 @@
       </div>
     </div>
   </div>
-  <script src="../../callapi.js"></script>
+  <script src="../../fecthAPI.js"></script>
   <script src="../validateForm.js"></script>
   <script src="./quanlynhanvien.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>

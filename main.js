@@ -1,7 +1,5 @@
 const { app, BrowserWindow, screen, Menu, ipcMain, ipcRenderer } = require('electron')
 const path = require('path')
-
-
 let nhanVienWindow = null;
 let mainWindow = null;
 
@@ -14,8 +12,8 @@ const createWindow = () => {
     minHeight: 500,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      enableRemoteModule: true,
+      // contextIsolation: true,
+      // enableRemoteModule: true,
       nodeIntegration: true,
     }
   });
@@ -28,6 +26,8 @@ const createWindow = () => {
     mainWindow = null;
   });
 }
+
+
 
 app.whenReady().then(() => {
   createWindow();
@@ -66,4 +66,16 @@ ipcMain.on('open-quanly', (event) => {
   }
 });
 
+ipcMain.on('open-focused-window', (event, screenID) => {
+  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
+  const focusedWindow = new BrowserWindow({
+    width: width,
+    height: height,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+  focusedWindow.loadURL(`./screenFocus.html?screenID=${screenID}`);
+});
 

@@ -1,9 +1,6 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
-const btnLogin = $('#btn-login');
-btnLogin.addEventListener('click', (event) => ValidateLogin(event));
-import { login } from "./fecthAPI.js";
-
+var isCall = false;
 const app = {
   screenFocus: function () {
     const screens = $$('.screen');
@@ -15,14 +12,19 @@ const app = {
           }
         });
         screen.classList.add('screen--focus');
-        addEventListenersToFocusedScreen();
+        if (!isCall) {
+          addEventListenersToFocusedScreen();
+          isCall = !isCall;
+        }
       };
     });
   },
 
+
   // Hàm thêm màn hình mới
   addScreen: function (id) {
-
+    const staff = document.querySelector(`.staff_${id}`);
+    staff.innerHTML = ``;
     const screenDiv = document.createElement('div');
     screenDiv.classList.add('screen');
     screenDiv.setAttribute('tabindex', '0');
@@ -31,10 +33,16 @@ const app = {
     // Tìm container và thêm màn hình vào trong container
     const container = $('.container');
     if (container) {
-      container.appendChild(screenDiv);
+      staff.appendChild(screenDiv);
     }
 
-    this.screenFocus(); // Gọi để thiết lập sự kiện cho màn hình mới
+    screenDiv.addEventListener('click', () => {
+      const screenID = id; // Truyền ID màn hình
+      window.ipcRenderer.send('open-focused-window', screenID);
+    });
+  
+
+    // this.screenFocus(); // Gọi để thiết lập sự kiện cho màn hình mới
     return screenDiv.querySelector('.screen__img'); // Trả về img vừa tạo
   },
 
@@ -51,28 +59,66 @@ const app = {
     }
   },
 
+  addDepartmentScreen(department) {
+    const screenDiv = document.createElement('div');
+    screenDiv.classList.add('department', `department_${department.id}`);
+    screenDiv.setAttribute('tabindex', '0');
+    screenDiv.addEventListener('click', () => renderStaffInDepartment(`${department.id}`));
+    screenDiv.innerHTML = `
+    <div>
+      <h3>${department.name}</h3>
+    </div>`
+    const container = $('.container');
+    if (container) {
+      container.appendChild(screenDiv);
+    }
+  },
+
+  addStaffInDepartment(staff) {
+    const container = document.querySelector('.container');
+    const staffDiv = document.createElement('div');
+    staffDiv.classList.add('staff', `staff_${staff.id}`);
+    staffDiv.setAttribute('tabindex', '0');
+
+    staffDiv.innerHTML = `
+      <div class="staff_info" onclick = "startShared(${staff.id})">
+        <div class="staff_avatar">
+          <img src= "${staff.avatar}" alt="${staff.name}'s Avatar" />
+        </div>
+        <h3 class="staff_name">${staff.name}</h3>
+      </div>`;
+
+    if (container) {
+      container.appendChild(staffDiv);
+    } else {
+      console.error('Container element not found!');
+    }
+  },
+
+
   start: function () {
     this.screenFocus(); // Thiết lập sự kiện cho các phần tử ban đầu
   }
 };
 
 // xác thức form đăng nhập 
-export default async function ValidateLogin(event) {
-  console.log(event)
+async function ValidateLogin(event) {
   event.preventDefault();
   const username = $('#username').value.trim();
   const password = $('#password').value.trim();
- 
+
   try {
-    // const data = await allApi.login(username, password, `authentication/login`);
-    const data = await login({username, password})
+    // const data = await login(username, password, 'rdp/api/v1/authentication/login');
 
     if (1) {
+      document.querySelector('.main-container').style.display = 'block';
       renderContent();
       document.getElementById('btn-quanly').addEventListener('click', () => {
         window.electronAPI.sendOpenQuanLy();
       });
       $('.login-container').innerHTML = '';
+      $('.login-container').remove();
+      renderDepartment();
     } else {
       $$('.form__group').forEach(group => group.classList.add('invalid'));
       $('.login-message').classList.add('invalid');
@@ -121,7 +167,7 @@ async function mainLogout() {
   const confirmLogout = confirm("Bạn có chắc chắn muốn đăng xuất không?");
   if (!confirmLogout) return;
   try {
-    const data = await allApi.logout(`authentication/logout`);
+    const data = await logout(`rdp/api/v1/authentication/logout`);
     if (data) {
       console.log('Đăng xuất thành công:', data);
 
@@ -131,7 +177,6 @@ async function mainLogout() {
       renderLoginForm();
     } else {
       console.error('Đăng xuất thất bại.');
-      alert('Có lỗi xảy ra khi đăng xuất. Vui lòng thử lại.');
     }
   } catch (error) {
     console.error('Lỗi trong quá trình đăng xuất:', error);
@@ -143,17 +188,17 @@ async function mainLogout() {
 function renderContent() {
   $('.main-container').innerHTML = `
       <div class="header">
-        <button id="btn-quanly" class=" btn btn-quanly">Quản lý</button>
+        <button id="btn-quanly" class="btn btn-quanly">Quản lý</button>
         <button class="btn btn-logout" onclick="mainLogout()">Đăng xuất</button>
       </div>
 
       <div class="main-content">
         <div class="container">
         </div>
-      </div>
-      <div class="footer"></div>`;
+      </div>`
 }
 
+// <div class="footer"></div>`;
 // xuất form login
 function renderLoginForm() {
   $('.main-container').innerHTML = '';
@@ -173,4 +218,117 @@ function renderLoginForm() {
         <button type="submit" class="btn btn--login" onclick="ValidateLogin(event)">Đăng Nhập</button>
       </form>
     </div>`;
+}
+
+function renderDepartment() {
+  // const departments = fetchDepartments();
+  const departments = [
+    {
+      "id": 1,
+      "name": "Phong A"
+    },
+    {
+      "id": 2,
+      "name": "Phong B"
+    },
+    {
+      "id": 3,
+      "name": "Phong C"
+    },
+    {
+      "id": 4,
+      "name": "Phong D"
+    },
+    {
+      "id": 5,
+      "name": "Phong E"
+    },
+    {
+      "id": 6,
+      "name": "Phong F"
+    },
+    {
+      "id": 1,
+      "name": "Phong A"
+    },
+    {
+      "id": 2,
+      "name": "Phong B"
+    },
+    {
+      "id": 3,
+      "name": "Phong C"
+    },
+    {
+      "id": 4,
+      "name": "Phong D"
+    },
+    {
+      "id": 5,
+      "name": "Phong E"
+    },
+    {
+      "id": 6,
+      "name": "Phong F"
+    }
+  ]
+  departments.forEach(department => {
+    app.addDepartmentScreen(department);
+  })
+}
+
+
+
+async function renderStaffInDepartment(id) {
+  // const staffs = await fetchStafsfInDepartment('4');
+  // console.log(staffs)
+  const staffs = [
+    {
+      "id": 1,
+      "name": "nguyen le nhat tuan",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPcxPeWOv5hO53QKF5sP60c7UJZh9V4Zllrg&s"
+    },
+    {
+      "id": 2,
+      "name": "bao",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPcxPeWOv5hO53QKF5sP60c7UJZh9V4Zllrg&s"
+    },
+    {
+      "id": 3,
+      "name": "truong",
+      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPcxPeWOv5hO53QKF5sP60c7UJZh9V4Zllrg&s"
+    },
+
+  ]
+  const container = document.querySelector('.container');
+  if (container) {
+    container.innerHTML = ``;
+  }
+  staffs.forEach(staff => {
+    app.addStaffInDepartment(staff);
+  })
+}
+
+async function fetchDepartments() {
+  try {
+    const departments = await allApi.fetchData(`rdp/api/v1/departments/all-departments`);
+    if (departments !== null) {
+      return departments;
+    }
+
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu department: ', error);
+  }
+}
+
+async function fetchStafsfInDepartment(id) {
+  try {
+    const staffs = await allApi.fetchData(`rdp/api/v1/departments/members-in-department/${id}`);
+    if (staffs !== null) {
+      return staffs.data;
+    }
+
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu staff: ', error);
+  }
 }

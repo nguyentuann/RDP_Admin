@@ -1,4 +1,4 @@
-const socket = io('http://localhost:3000');
+var socket;
 const configuration = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' }
@@ -7,56 +7,71 @@ const configuration = {
 
 let peerConnection;
 let remoteVideo;
+let dataChannel;
+let eventsAdded;
 
 function createPeerConnection() {
   peerConnection = new RTCPeerConnection(configuration);
-  console.log(peerConnection)
+  console.log("Tao: " + peerConnection) //so 2
+
+
+  peerConnection.ondatachannel = (event) => {
+    console.log(event)
+    dataChannel = event.channel;
+    dataChannel.onopen = () => {
+      console.log("DataChannel đã mở");
+    };
+    dataChannel.onclose = () => {
+      console.log("DataChannel đã đóng");
+    };
+  };
+
+
   // Xử lý ice candidates
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
+      console.log("Gui ice-candidate: " + event.candidate) //so 4
       socket.emit('ice-candidate', event.candidate);
     }
   };
 
   // Xử lý remote stream
-  remoteVideo = app.addScreen('123456');
+  remoteVideo = app.addScreen('1');
   console.log(remoteVideo)
   peerConnection.ontrack = (event) => {
     remoteVideo.srcObject = event.streams[0]; // thiet lap luong man hinh
   };
+
 }
 
-// socket.on('answer', async (answer) => {
-//   try {
-//     console.log(answer)
-//     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
-//   } catch (err) {
-//     console.log(err);
-//   }
-// })
 
+function startShared(id) {
+  socket = io('http://192.168.33.157:3000');
+  socket.emit('request-screen', JSON.stringify({
+    "type": "request-screen",
+    "data": id,
+  }));
+  
+  socket.on('offer', async (offer) => {
+    console.log("Nhan Offer:" + offer); // so 1
+    try {
+      if (!peerConnection) {
+        createPeerConnection();
+      }
 
-socket.on('offer', async (offer) => {
-  try {
-    console.log(offer)
-    if (!peerConnection) {
-      createPeerConnection();
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      const answer = await peerConnection.createAnswer();
+      await peerConnection.setLocalDescription(answer);
+      socket.emit('answer', answer);
+      console.log("Gui answer: " + answer) // so 3
+    } catch (err) {
+      console.log(err);
     }
+  })
+}
 
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-    socket.emit('answer', answer);
-  } catch (err) {
-    console.log(err);
-  }
-})
 
-socket.on('ice-candidate', async (candidate) => {
-  try {
-    console.log(candidate)
-    await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-  } catch (err) {
-    console.log(err);
-  }
-})
+
+
+
+

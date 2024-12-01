@@ -15,16 +15,14 @@ const btnHuy = $('.btn--exit');
 
 
 // các trường của form
-const formId = document.getElementById("id");
-const formName = document.getElementById("name");
 const formEmail = document.getElementById("email");
 const formPassword = document.getElementById("password");
-const formDepartment = document.getElementById("department");
+const formName = document.getElementById("name");
 const formJobTitle = document.getElementById("jobTitle");
 const formCompanyName = document.getElementById("companyName");
 
 // Biến toàn cục
-let departmentsMap = {};
+// let departmentsMap = {};
 let employees = [];
 let currentSortColumn = '';
 let sortOrder = 'asc';
@@ -43,39 +41,24 @@ function addRowEmployee(data) {
         </button>
       </td>
       <td>${data.id}</td>
-      <td>${data.name}</td>
       <td>${data.email}</td>
       <td>${data.password}</td>
-      <td>${unitsMap[data.unit] || data.unit}</td> 
-      <td>${data.part}</td>
-      <td>${data.position}</td>
+      <td>${data.name}</td>
+      <td>${data.jobTitle}</td> 
+      <td>${data.companyName}</td>
     </tr>
   `;
   inforBody.innerHTML += str;
 }
 
-// load dữ liệu lúc đầu
-async function fetchDepartment() {
-  try {
-
-    const departments = await allApi.fetchData(`departments/all-departments`);
-
-    // Chuyển đổi danh sách phòng ban thành một bản đồ với ID là key và name là value
-    departments.forEach(department => {
-      departmentsMap[department.id] = department.name;
-    });
-  } catch (error) {
-    console.error('Lỗi khi lấy dữ liệu đơn vị:', error);
-  }
-}
-
 async function fetchEmployees() {
   try {
-    await fetchUnits(); // Tải danh sách đơn vị trước
 
-    employees = await allApi.fetchData(`users/all-users`);
+    const employeesObj = await allApi.fetchData(`rdp/api/v1/users/all-users`);
+    console.log(employeesObj)
+    employees = employeesObj.data;
 
-    if (employees !== null) {
+    if (employees!== null) {
       // Gọi hàm để thêm từng nhân viên vào bảng
       employees.forEach(employee => addRowEmployee(employee));
     }
@@ -86,33 +69,6 @@ async function fetchEmployees() {
 
 // Gọi hàm để tải dữ liệu lúc đầu
 document.addEventListener("DOMContentLoaded", fetchEmployees);
-
-
-async function departmentOptions() {
-  const departmentSelect = document.getElementById('department');
-
-  try {
-    const departments = await allApi.fetchData(`departments/all-departments`);
-
-    // Kiểm tra xem phản hồi có thành công không
-    if (departments!==null) {
-      // Duyệt qua từng đơn vị và thêm vào select
-      departments.forEach(department => {
-        const option = document.createElement('option');
-        option.value = department.id; // Giá trị của option là ID
-        option.textContent = department.name; // Văn bản hiển thị là tên đơn vị
-        departmentSelect.appendChild(option);
-      });
-    } else {
-      console.error('Lỗi khi tải danh sách đơn vị:', response.statusText);
-    }
-  } catch (error) {
-    console.error('Lỗi khi gửi yêu cầu:', error);
-  }
-}
-
-// Gọi hàm populateUnitOptions khi trang đã tải xong
-document.addEventListener("DOMContentLoaded", populateUnitOptions);
 
 // Hàm xóa form
 function clearFormErrors() {
@@ -134,16 +90,12 @@ async function addEmployee() {
   $('.header__form').textContent = "Thêm nhân viên";
   formId.style.display = 'none';
   document.querySelector("label[for='id']").style.display = "none";
-  formName.removeAttribute("readonly");
-  formEmail.removeAttribute("readonly");
+  document.querySelector("label[for='name']").style.display = "none";
+  document.querySelector("label[for='jobTitle']").style.display = "none";
+  document.querySelector("label[for='companyName']").style.display = "none";
 
-  // Xóa các trường input
-  formName.value = '';
   formEmail.value = '';
   formPassword.value = '';
-  formUnit.value = formUnit.options[0].value;
-  formPart.value = '';
-  formPosition.value = '';
 
   // Khởi tạo validator chỉ một lần
   const formValidator = new Validator('#form');
@@ -161,16 +113,11 @@ async function addEmployee() {
       event.preventDefault(); // Ngăn chặn sự kiện gửi đi của form
 
       const newEmployee = {
-        id: uuid.v4(), // Sử dụng uuid để tạo ID mới
-        name: formName.value,
         email: formEmail.value,
         password: formPassword.value,
-        unit: formUnit.value,
-        part: formPart.value,
-        position: formPosition.value
       };
 
-      const employee = await allApi.addData('employees', newEmployee);
+      const employee = await allApi.addData('rdp/api/v1/users/user', newEmployee);
       addRowEmployee(employee);
 
     } else {
@@ -187,21 +134,18 @@ async function editEmployee(button) {
 
   const row = button.closest("tr");
   const id = row.cells[1].textContent;
-  const name = row.cells[2].textContent;
-  const email = row.cells[3].textContent;
-  const password = row.cells[4].textContent;
-  const unit = row.cells[5].textContent;
-  const part = row.cells[6].textContent;
-  const position = row.cells[7].textContent;
+  const email = row.cells[2].textContent;
+  const password = row.cells[3].textContent;
+  const name = row.cells[4].textContent;
+  const jobTitle = row.cells[5].textContent;
+  const companyName = row.cells[6].textContent;
 
   // Điền dữ liệu vào form
-  formId.value = id;
-  formName.value = name;
   formEmail.value = email;
   formPassword.value = password;
-  formUnit.value = Object.keys(unitsMap).find(key => unitsMap[key] === unit);
-  formPart.value = part;
-  formPosition.value = position;
+  formName.value = name;
+  formJobTitle.value = jobTitle;
+  formCompanyName.value = companyName;
 
   // Khởi tạo validator chỉ một lần
   const formValidator = new Validator('#form');
@@ -217,27 +161,21 @@ async function editEmployee(button) {
     if (formValidator.validateForm()) {
       console.log(formValidator.validateForm());
       const updatedEmployee = {
-        id: id,
         name: formName.value,
         email: formEmail.value,
         password: formPassword.value,
-        unit: formUnit.value,
-        part: formPart.value,
-        position: formPosition.value
+        jobTitle: formJobTitle.value,
+        avatar: "",
+        companyName: formCompanyName.value,
       };
 
-      // var xhttp = new XMLHttpRequest();
-      // xhttp.open('PUT', `http://localhost:3000/employees/${id}`, true);
-      // xhttp.setRequestHeader('Content-Type', 'application/json');
-
-      const data = await allApi.updateData('employees', updatedEmployee.id, updatedEmployee);
+      const data = await allApi.updateData('rdp/api/v1/users/user', id, updatedEmployee);
       if (data) {
         row.cells[2].textContent = updatedEmployee.name;
         row.cells[3].textContent = updatedEmployee.email;
         row.cells[4].textContent = updatedEmployee.password;
-        row.cells[5].textContent = unitsMap[updatedEmployee.unit]; // Hiển thị tên đơn vị
-        row.cells[6].textContent = updatedEmployee.part;
-        row.cells[7].textContent = updatedEmployee.position;
+        row.cells[5].textContent = updatedEmployee.part;
+        row.cells[6].textContent = updatedEmployee.position;
 
         // Đóng form chỉnh sửa
         closeForm();
@@ -254,7 +192,7 @@ async function deleteEmployee(button) {
   const id = row.cells[1].textContent;
   const isConfirmed = confirm("Bạn có chắc chắn muốn xóa phòng ban này?");
   if (isConfirmed) {
-    const data = await allApi.deleteData('employees', id);
+    const data = await allApi.deleteData('rdp/api/v1/users/user', id);
   }
 }
 
@@ -281,9 +219,8 @@ function searchEmployees() {
   const filteredEmployees = employees.filter(employee => {
     if (searchOption === 'name') {
       return employee.name.toLowerCase().includes(searchTerm);
-    } else if (searchOption === 'department') {
-      const unitName = unitsMap[employee.unit];
-      return unitName && unitName.toLowerCase().includes(searchTerm);
+    } else if (searchOption === 'email') {
+      return employee.email.toLowerCase().includes(searchTerm);
     }
     return false;
   });
@@ -311,24 +248,13 @@ function sortEmployees(column) {
 
   // Sắp xếp dựa trên cột được chỉ định
   const sortedEmployees = employees.sort((a, b) => {
-    let compareA, compareB;
+    const compareA = a[column] || '';
+    const compareB = b[column] || '';
 
-    // Kiểm tra cột nào đang được sắp xếp
-    if (column === 'unit') {
-      compareA = unitsMap[a.unit] || '';
-      compareB = unitsMap[b.unit] || '';
-    } else {
-      // Đối với các cột còn lại, bao gồm "Mã nhân viên"
-      compareA = a[column] || '';
-      compareB = b[column] || '';
-    }
-
-    // Sử dụng localeCompare để sắp xếp chuỗi, hoặc so sánh số nếu là mã nhân viên
-    if (column === 'id') { // Nếu cột là mã nhân viên, so sánh số
-      return (sortOrder === 'asc') ? (a.id - b.id) : (b.id - a.id);
-    } else {
-      return (sortOrder === 'asc') ? compareA.localeCompare(compareB) : compareB.localeCompare(compareA);
-    }
+    // Sử dụng localeCompare để sắp xếp chuỗi
+    return (sortOrder === 'asc') 
+      ? compareA.localeCompare(compareB) 
+      : compareB.localeCompare(compareA);
   });
 
   // Xóa nội dung cũ trong bảng
@@ -337,5 +263,7 @@ function sortEmployees(column) {
   // Hiển thị danh sách đã sắp xếp
   sortedEmployees.forEach(employee => addRowEmployee(employee));
 }
+
+
 
 

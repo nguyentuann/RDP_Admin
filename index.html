@@ -27,18 +27,17 @@
           <input type="password" id="password" name="password" required placeholder="Mật khẩu" value="admin">
         </div>
         <span class="login-message"></span>
-        <button type="button" class="btn btn--login" id ="btn-login" >Đăng Nhập</button>
+        <button type="button" class="btn btn--login" onclick="ValidateLogin(event)" >Đăng Nhập</button>
       </form>
     </div>
   </div>
-
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" crossorigin="anonymous"></script>
-  <script type = "module" src="./index.js"></script>
-  <!-- <script src="./upd_control/receiveScreens.js"></script> -->
-  <!-- <script src="./upd_control/sendEvents.js"></script> -->
-  <!-- <script src="http://192.168.34.220:3000/socket.io/socket.io.js"></script> -->
+  <script src="./index.js"></script>
+  <script src="./fecthAPI.js"></script>
+  <script src="./upd_control/receiveScreens.js"></script>
+  <script src="./upd_control/sendEventNonServer.js"></script>
+  <!-- <script src="http://localhost:3000/socket.io/socket.io.js"></script> -->
   
 </body>
 </html>

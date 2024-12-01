@@ -35,7 +35,8 @@ function addRowDepartment(data) {
 
 async function fetchDepartments() {
   try {
-    departments = await allApi.fetchData('departments');
+    const departmentsObj = await allApi.fetchData(`rdp/api/v1/departments/all-departments`);
+    departments = departmentsObj.data;
     if (departments !== null) {
       // Gọi hàm để thêm từng phòng ban vào bảng
       departments.forEach(department => addRowDepartment(department));
@@ -69,7 +70,7 @@ async function addDepartment() {
   editForm.style.display = "block";
   $('.header__form').textContent = "Thêm phòng ban";
   formId.style.display = 'none';
-  document.querySelector("label[for='id']").style.display = "none";
+  // document.querySelector("label[for='id']").style.display = "none";
   formName.removeAttribute("readonly");
 
   formName.value = '';
@@ -85,11 +86,10 @@ async function addDepartment() {
       event.preventDefault(); // Ngăn chặn sự kiện gửi đi của form
 
       const newDepartment = {
-        id: uuid.v4(), // Sử dụng uuid để tạo ID mới
         name: formName.value,
       };
 
-      const data = await allApi.addData('departments', newDepartment);
+      const data = await allApi.addData(`rdp/api/v1/departments/department`, newDepartment);
       if (data) {
         addRowDepartment(newDepartment);
         closeForm();
