@@ -20,7 +20,6 @@ const app = {
     });
   },
 
-
   // Hàm thêm màn hình mới
   addScreen: function (id) {
     const staff = document.querySelector(`.staff_${id}`);
@@ -36,13 +35,7 @@ const app = {
       staff.appendChild(screenDiv);
     }
 
-    screenDiv.addEventListener('click', () => {
-      const screenID = id; // Truyền ID màn hình
-      window.ipcRenderer.send('open-focused-window', screenID);
-    });
-  
-
-    // this.screenFocus(); // Gọi để thiết lập sự kiện cho màn hình mới
+    this.screenFocus(); // Gọi để thiết lập sự kiện cho màn hình mới
     return screenDiv.querySelector('.screen__img'); // Trả về img vừa tạo
   },
 
@@ -64,6 +57,7 @@ const app = {
     screenDiv.classList.add('department', `department_${department.id}`);
     screenDiv.setAttribute('tabindex', '0');
     screenDiv.addEventListener('click', () => renderStaffInDepartment(`${department.id}`));
+    screenDiv.addEventListener('click', () => startShared(`${department.id}`))
     screenDiv.innerHTML = `
     <div>
       <h3>${department.name}</h3>
@@ -75,13 +69,14 @@ const app = {
   },
 
   addStaffInDepartment(staff) {
+
     const container = document.querySelector('.container');
     const staffDiv = document.createElement('div');
     staffDiv.classList.add('staff', `staff_${staff.id}`);
     staffDiv.setAttribute('tabindex', '0');
 
     staffDiv.innerHTML = `
-      <div class="staff_info" onclick = "startShared(${staff.id})">
+      <div class="staff_info">
         <div class="staff_avatar">
           <img src= "${staff.avatar}" alt="${staff.name}'s Avatar" />
         </div>
@@ -93,6 +88,11 @@ const app = {
     } else {
       console.error('Container element not found!');
     }
+  },
+
+  back() {
+    renderDepartment();
+    document.querySelector('.btn-back').style.display = 'none';
   },
 
 
@@ -108,9 +108,9 @@ async function ValidateLogin(event) {
   const password = $('#password').value.trim();
 
   try {
-    // const data = await login(username, password, 'rdp/api/v1/authentication/login');
+    const data = await login(username, password, 'rdp/api/v1/authentication/login');
 
-    if (1) {
+    if (data) {
       document.querySelector('.main-container').style.display = 'block';
       renderContent();
       document.getElementById('btn-quanly').addEventListener('click', () => {
@@ -188,6 +188,7 @@ async function mainLogout() {
 function renderContent() {
   $('.main-container').innerHTML = `
       <div class="header">
+        <button id="btn-back" class="btn btn-back">Quay lại</button>
         <button id="btn-quanly" class="btn btn-quanly">Quản lý</button>
         <button class="btn btn-logout" onclick="mainLogout()">Đăng xuất</button>
       </div>
@@ -221,6 +222,7 @@ function renderLoginForm() {
 }
 
 function renderDepartment() {
+  document.querySelector('.container').innerHTML = '';
   // const departments = fetchDepartments();
   const departments = [
     {
@@ -280,23 +282,26 @@ function renderDepartment() {
 
 
 async function renderStaffInDepartment(id) {
+  const btnBack = document.querySelector('.btn-back');
+  btnBack.style.display = 'block';
+  btnBack.addEventListener('click', () => app.back())
   // const staffs = await fetchStafsfInDepartment('4');
   // console.log(staffs)
   const staffs = [
     {
       "id": 1,
       "name": "nguyen le nhat tuan",
-      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPcxPeWOv5hO53QKF5sP60c7UJZh9V4Zllrg&s"
+      "avatar": "https://images.spiderum.com/sp-images/e9fef2d083cf11ea8f996dbfbe6e50b1.jpg"
     },
     {
       "id": 2,
       "name": "bao",
-      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPcxPeWOv5hO53QKF5sP60c7UJZh9V4Zllrg&s"
+      "avatar": "https://images.spiderum.com/sp-images/e9fef2d083cf11ea8f996dbfbe6e50b1.jpg"
     },
     {
-      "id": 3,
+      "id": 33,
       "name": "truong",
-      "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPcxPeWOv5hO53QKF5sP60c7UJZh9V4Zllrg&s"
+      "avatar": "https://images.spiderum.com/sp-images/e9fef2d083cf11ea8f996dbfbe6e50b1.jpg"
     },
 
   ]

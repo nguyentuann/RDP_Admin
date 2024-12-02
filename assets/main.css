@@ -43,6 +43,11 @@ body {
   z-index: 10000;
 }
 
+.btn-back {
+  margin-right: 75%;
+  display: none;
+}
+
 .footer {
   bottom: 0;
 }

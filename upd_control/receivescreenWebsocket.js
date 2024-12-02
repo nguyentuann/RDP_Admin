@@ -1,87 +1,326 @@
-// Khởi tạo WebSocket connection với token bearer
+
+
+let socket;
+let peerConnection;
+let remoteVideo;
+let dataChannel;
+let isSocketConnected = false;
+
+// Cấu hình ICE servers cho WebRTC
+const configuration = {
+  iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+};
+
+// Hàm khởi tạo WebSocket connection
 function connectWebSocket(token) {
-  // const headers = {
-  //     'Authorization': `Bearer ${token}`
-  // };
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    console.log('WebSocket đã kết nối, không cần tạo lại');
+    return;
+  }
 
   try {
-      // Thêm logging để debug
-      console.log('Đang kết nối đến WebSocket với token:', token);
-      
-      const ws = new WebSocket('ws://192.168.33.113:8088/rdp/ws');
-      
-      ws.onopen = () => {
-        console.log('WebSocket đã kết nối thành công');
-    
-        // Gửi thông điệp xác thực chứa token
-        const authMessage = {
-            "token": token,          
-        };
-        
-        ws.send(JSON.stringify(authMessage));  // Gửi thông điệp xác thực
-        console.log('Đã gửi token xác thực');
+    console.log('Đang kết nối đến WebSocket với token:', token);
+
+    socket = new WebSocket('ws://10.10.49.124:8088/rdp/ws');
+
+    socket.onopen = () => {
+      console.log('WebSocket đã kết nối thành công');
+      isSocketConnected = true;
+
+      // Gửi xác thực
+      sendMessage('authentication', { token: token });
+      console.log('Đã gửi token xác thực');
     };
 
-      ws.onmessage = (event) => {
-          try {
-              const data = JSON.parse(event.data);
-              console.log('Nhận được message:', data);
-          } catch (error) {
-              console.error('Lỗi khi parse message:', error);
-          }
-      };
+    socket.onmessage = (event) => {
+      console.log("Nhan duoc event: " + event);
+      try {
+        const data = JSON.parse(event.data);
+        console.log('Nhận được message:', data);
 
-      ws.onerror = (event) => {
-          console.error('Lỗi WebSocket:', {
-              error: event.error,
-              type: event.type,
-              message: event.message,
-              // Log thêm thông tin về connection
-              readyState: ws.readyState,
-              url: ws.url
-          });
-      };
+        switch (data.type) {
+          case 'offer':
+            handleOffer(data.data.offer);
+            break;
+          case 'answer':
+            handleAnswer(data.data.answer);
+            break;
+          case 'ice-candidate':
+            handleIceCandidate(data.data['ice-candidate']);
+            break;
+          default:
+            console.log('Không xử lý được loại message:', data.type);
+        }
+      } catch (error) {
+        console.error('Lỗi khi parse message:', error);
+      }
+    };
 
-      ws.onclose = (event) => {
-          console.log('WebSocket đã đóng:', {
-              code: event.code,
-              reason: event.reason,
-              wasClean: event.wasClean
-          });
-          
-          // Thêm mã lỗi cụ thể
-          switch (event.code) {
-              case 1000:
-                  console.log("Đóng kết nối bình thường");
-                  break;
-              case 1006:
-                  console.log("Kết nối bị đóng bất thường - có thể do vấn đề handshake");
-                  break;
-              case 1015:
-                  console.log("Lỗi TLS handshake");
-                  break;
-              default:
-                  console.log("Đóng kết nối với mã:", event.code);
-          }
-      };
+    socket.onerror = (event) => {
+      console.error('Lỗi WebSocket:', event);
+    };
 
-      return ws;
+    socket.onclose = (event) => {
+      console.log('WebSocket đã đóng:', event);
+      isSocketConnected = false;
+    };
   } catch (error) {
-      console.error('Không thể kết nối WebSocket:', error);
-      return null;
+    console.error('Không thể kết nối WebSocket:', error);
   }
 }
 
-// Sử dụng function
-const token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBnbWFpbC5jb20iLCJzY29wZSI6IlJPTEVfQURNSU4iLCJpc3MiOiJyZHAuY29tIiwiZXhwIjoxNzMzMTQ2MjE4LCJpYXQiOjE3MzMwNTk4MTgsImp0aSI6ImM1NDMyZTAyLWRiMTEtNGVkNC04NTYyLWI1ZGZhMDkyMTdhZCJ9.z1kdmtmcjTqTa4nG2OCi52wrVKWSntOao6QZhhMfWeXyYs_eTK1j20fPaFe9OZUJctTutHTN28y-li3Q1I5HlQ'; 
-const wsConnection = connectWebSocket(token);
-console.log(wsConnection);
-
-// Gửi message (nếu cần)
-function sendMessage(message) {
-  if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
-      wsConnection.send(JSON.stringify(message));
+// Gửi message qua WebSocket
+function sendMessage(type, data) {
+  if (socket && socket.readyState === WebSocket.OPEN) {
+    const message = { type: type, data: data };
+    socket.send(JSON.stringify(message));
+    console.log(`Đã gửi message: ${type}`, data);
   } else {
-      console.error('WebSocket chưa được kết nối');
+    console.error('WebSocket chưa được kết nối');
   }
 }
+
+// Tạo kết nối WebRTC
+function createPeerConnection() {
+  peerConnection = new RTCPeerConnection(configuration);
+
+  // Lắng nghe data channel
+  peerConnection.ondatachannel = (event) => {
+    dataChannel = event.channel;
+    dataChannel.onopen = () => console.log('DataChannel đã mở');
+    dataChannel.onclose = () => console.log('DataChannel đã đóng');
+  };
+
+  // Xử lý ICE candidates
+  peerConnection.onicecandidate = (event) => {
+    if (event.candidate) {
+      sendMessage('ice-candidate', { 'ice-candidate': event.candidate });
+      console.log('Đã gửi ice-candidate:', event.candidate);
+    }
+  };
+
+  // Xử lý remote stream
+  remoteVideo = app.addScreen('1');
+  peerConnection.ontrack = (event) => {
+    remoteVideo.srcObject = event.streams[0];
+    console.log('Đã nhận track:', event.streams[0]);
+  };
+}
+
+// Xử lý khi nhận được offer
+async function handleOffer(offer) {
+  console.log('Nhận được offer:', offer);
+  try {
+    if (!peerConnection) createPeerConnection();
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    sendMessage('answer', { answer: answer });
+    console.log('Đã gửi answer:', answer);
+  } catch (err) {
+    console.error('Lỗi khi xử lý offer:', err);
+  }
+}
+
+// Xử lý khi nhận được answer
+async function handleAnswer(answer) {
+  console.log('Nhận được answer:', answer);
+  try {
+    await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+  } catch (err) {
+    console.error('Lỗi khi xử lý answer:', err);
+  }
+}
+
+// Xử lý khi nhận được ice-candidate
+function handleIceCandidate(candidate) {
+  console.log('Nhận được ICE candidate:', candidate);
+  try {
+    const iceCandidate = new RTCIceCandidate(candidate);
+    peerConnection.addIceCandidate(iceCandidate);
+  } catch (err) {
+    console.error('Lỗi khi thêm ICE candidate:', err);
+  }
+}
+
+// Bắt đầu chia sẻ màn hình
+function startShared(id) {
+  console.log(id);
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    console.error('Token không hợp lệ');
+    return;
+  }
+  // Đảm bảo kết nối WebSocket
+  connectWebSocket(token);
+
+  connectClient(id);
+}
+
+
+function connectClient(id) {
+  const interval = setInterval(() => {
+    if (isSocketConnected) {
+      sendMessage('start-share-screen', { departmentId: 1 });
+      console.log('Đã gửi sự kiện start-share-screen');
+      clearInterval(interval);
+    }
+  }, 1000);
+}
+
+
+
+
+// let socket;
+// const configuration = {
+//   iceServers: [
+//     { urls: 'stun:stun.l.google.com:19302' }
+//   ]
+// };
+
+// let peerConnection;
+// let remoteVideo;
+// let dataChannel;
+// let eventsAdded;
+
+// // Khởi tạo WebSocket connection với token bearer
+// function connectWebSocket(token) {
+//   try {
+//     console.log('Đang kết nối đến WebSocket với token:', token);
+
+//     // Kết nối WebSocket
+//     socket = new WebSocket('ws://192.168.33.113:8088/rdp/ws');
+
+//     socket.onopen = () => {
+//       console.log('WebSocket đã kết nối thành công');
+
+//       sendMessage('authentication', { token: token })
+//       console.log('Đã gửi token xác thực');
+
+//       sendMessage('start-share-screen', { id: '33' });
+//       console.log('da gui start share')
+
+//     };
+
+   
+
+//     socket.onmessage = (event) => {
+//       try {
+//         const data = JSON.parse(event.data);
+//         console.log('Nhận được message:', data);
+//         if (data.type === 'offer') {
+//           handleOffer(data.offer);
+//         } else if (data.type === 'answer') {
+//           handleAnswer(data.answer);
+//         } else if (data.type === 'ice-candidate') {
+//           handleIceCandidate(data.candidate);
+//         }
+//       } catch (error) {
+//         console.error('Lỗi khi parse message:', error);
+//       }
+//     };
+
+//     socket.onerror = (event) => {
+//       console.error('Lỗi WebSocket:', event);
+//     };
+
+//     socket.onclose = (event) => {
+//       console.log('WebSocket đã đóng:', event);
+//     };
+
+//   } catch (error) {
+//     console.error('Không thể kết nối WebSocket:', error);
+//     return null;
+//   }
+// }
+
+// // Tạo PeerConnection
+// function createPeerConnection() {
+//   peerConnection = new RTCPeerConnection(configuration);
+//   console.log("Tao: " + peerConnection); //so 2
+
+//   peerConnection.ondatachannel = (event) => {
+//     console.log(event);
+//     dataChannel = event.channel;
+//     dataChannel.onopen = () => {
+//       console.log("DataChannel đã mở");
+//     };
+//     dataChannel.onclose = () => {
+//       console.log("DataChannel đã đóng");
+//     };
+//   };
+
+//   // Xử lý ice candidates
+//   peerConnection.onicecandidate = (event) => {
+//     if (event.candidate) {
+//       console.log("Gui ice-candidate: " + event.candidate); //so 4
+//       // socket.send(JSON.stringify({ type: 'ice-candidate', data: event.candidate }));
+//       sendMessage('ice-candidate', { 'ice-candidate': event.candidate })
+//     }
+//   };
+
+//   // Xử lý remote stream
+//   remoteVideo = app.addScreen('33');
+//   peerConnection.ontrack = (event) => {
+//     remoteVideo.srcObject = event.streams[0]; // Thiết lập lượng màn hình
+//   };
+// }
+
+// // Xử lý khi nhận được offer
+// async function handleOffer(offer) {
+//   console.log("Nhan Offer:" + offer); // so 1
+//   try {
+//     if (!peerConnection) {
+//       createPeerConnection();
+//     }
+
+//     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+//     const answer = await peerConnection.createAnswer();
+//     await peerConnection.setLocalDescription(answer);
+//     // socket.send(JSON.stringify({ type: 'answer', data: answer }));
+//     sendMessage('answer', { answer: answer });
+//     console.log("Gui answer: " + answer); // so 3
+//   } catch (err) {
+//     console.log(err);
+//   }
+// }
+
+// // Xử lý khi nhận được answer
+// async function handleAnswer(answer) {
+//   try {
+//     await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+//   } catch (err) {
+//     console.log('Lỗi khi thiết lập remote description cho answer:', err);
+//   }
+// }
+
+// // Xử lý khi nhận được ice-candidate
+// function handleIceCandidate(candidate) {
+//   try {
+//     const iceCandidate = new RTCIceCandidate(candidate);
+//     peerConnection.addIceCandidate(iceCandidate);
+//   } catch (err) {
+//     console.log('Lỗi khi thêm ICE candidate:', err);
+//   }
+// }
+
+// // Sử dụng function
+// const token = localStorage.getItem("jwtToken");
+// console.log("token:" + token)
+// // const wsConnection = connectWebSocket(token);
+// function startShared(id) {
+//   connectWebSocket(token);
+// }
+
+// // Gửi message (nếu cần)
+// function sendMessage(type, data) {
+//   if (socket && socket.readyState === WebSocket.OPEN) {
+//     const message = {
+//       type: type,
+//       data: data
+//     }
+//     socket.send(JSON.stringify(message));
+//   } else {
+//     console.error('WebSocket chưa được kết nối');
+//   }
+// }

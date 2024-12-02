@@ -113,6 +113,7 @@ body {
   border-collapse: collapse;
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  table-layout: fixed;
 }
 
 .content__infor th,
@@ -121,6 +122,9 @@ body {
   border: 1px solid #ddd;
   text-align: center;
   height: 100%;
+  text-overflow: ellipsis; 
+  overflow: hidden; 
+  white-space: nowrap;
 }
 .content__infor th {
   cursor: pointer;
@@ -237,13 +241,18 @@ input[readonly] {
 /* Xong CSS Form thay doi thong tin */
 
 /* Css cho quản lý phòng ban */
-.column--action {
-  width: 12%;
-}
-.column--id {
+.column--12 {
   width: 12%;
 }
 
+.column--24 {
+  /* width: 24%; */
+  width: 100px;
+}
+
+.column--36 {
+  width: 36%;
+}
 
 
 /* Xong CSS cho quản lý phòng ban */

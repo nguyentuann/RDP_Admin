@@ -116,6 +116,7 @@ function Validator(formSelector) {
           isValid = false;
         }
       }
+      console.log(isValid);
       return isValid;
     };
   }

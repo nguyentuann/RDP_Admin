@@ -33,7 +33,7 @@ function addRowEmployee(data) {
   const str = `
     <tr>
       <td class="body__action">
-        <button class="btn btn--delete" onclick="deleteEmployee(this)">
+        <button class="btn btn--delete" onclck="deleteEmployee(this)">
           <i class="fa-solid fa-trash"></i>
         </button>
         <button class="btn btn--edit" onclick="editEmployee(this)">
@@ -43,7 +43,7 @@ function addRowEmployee(data) {
       <td>${data.id}</td>
       <td>${data.email}</td>
       <td>${data.password}</td>
-      <td>${data.name}</td>
+      <td>${data.username}</td>
       <td>${data.jobTitle}</td> 
       <td>${data.companyName}</td>
     </tr>
@@ -58,7 +58,7 @@ async function fetchEmployees() {
     console.log(employeesObj)
     employees = employeesObj.data;
 
-    if (employees!== null) {
+    if (employees !== null) {
       // Gọi hàm để thêm từng nhân viên vào bảng
       employees.forEach(employee => addRowEmployee(employee));
     }
@@ -88,11 +88,22 @@ async function addEmployee() {
   clearFormErrors();
   editForm.style.display = "block";
   $('.header__form').textContent = "Thêm nhân viên";
-  formId.style.display = 'none';
-  document.querySelector("label[for='id']").style.display = "none";
-  document.querySelector("label[for='name']").style.display = "none";
-  document.querySelector("label[for='jobTitle']").style.display = "none";
-  document.querySelector("label[for='companyName']").style.display = "none";
+
+  const formGroups = document.querySelectorAll('.form__group');
+
+  formGroups.forEach((formGroup) => {
+    const input = formGroup.querySelector('input');
+    const buttonGroup = formGroup.querySelector('.btn'); 
+
+    if (buttonGroup) {
+      return; 
+    }
+    if (input && (input.id === 'email' || input.id === 'password')) {
+      input.removeAttribute('readonly');
+    } else {
+      formGroup.remove();
+    }
+  });
 
   formEmail.value = '';
   formPassword.value = '';
@@ -113,12 +124,15 @@ async function addEmployee() {
       event.preventDefault(); // Ngăn chặn sự kiện gửi đi của form
 
       const newEmployee = {
-        email: formEmail.value,
+        username: formEmail.value,
         password: formPassword.value,
       };
 
       const employee = await allApi.addData('rdp/api/v1/users/user', newEmployee);
-      addRowEmployee(employee);
+      if(employee) {
+        fetchEmployees()
+        closeForm();
+      }
 
     } else {
       console.log("Form không hợp lệ!");
@@ -252,8 +266,8 @@ function sortEmployees(column) {
     const compareB = b[column] || '';
 
     // Sử dụng localeCompare để sắp xếp chuỗi
-    return (sortOrder === 'asc') 
-      ? compareA.localeCompare(compareB) 
+    return (sortOrder === 'asc')
+      ? compareA.localeCompare(compareB)
       : compareB.localeCompare(compareA);
   });
 

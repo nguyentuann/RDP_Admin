@@ -66,16 +66,34 @@ ipcMain.on('open-quanly', (event) => {
   }
 });
 
-ipcMain.on('open-focused-window', (event, screenID) => {
-  const { width, height } = screen.getPrimaryDisplay().workAreaSize;
-  const focusedWindow = new BrowserWindow({
-    width: width,
-    height: height,
+
+let streamCache = null; // Biến toàn cục để lưu trữ stream
+
+ipcMain.on('open-new-window-with-stream', (event) => {
+  const newWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
     },
   });
-  focusedWindow.loadURL(`./screenFocus.html?screenID=${screenID}`);
+  
+  newWindow.loadFile('screenFocus.html'); // Giao diện của cửa sổ mới
+
+  // Gửi thông báo khi cửa sổ đã sẵn sàng
+  newWindow.webContents.once('dom-ready', () => {
+    if (streamCache) {
+      newWindow.webContents.send('set-stream', streamCache);
+    }
+  });
 });
 
+// Nhận stream từ renderer process và lưu lại
+ipcMain.on('cache-stream', (event, stream) => {
+  if (stream) {
+    streamCache = stream;  // Lưu stream hợp lệ vào cache
+  } else {
+    console.error('Received invalid MediaStream');
+  }
+});
