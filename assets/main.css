@@ -48,6 +48,11 @@ body {
   display: none;
 }
 
+.btn-unfocus {
+  margin-right: 75%;
+  display: none;
+}
+
 .footer {
   bottom: 0;
 }
@@ -124,8 +129,8 @@ body {
 }
 
 .staff_avatar {
-  height: 70%;
-  width: 70%;
+  height: 60%;
+  width: 40%;
   padding: 10px;
   display: flex;
   align-items: center;
@@ -168,19 +173,20 @@ body {
 
 /* Media query cho màn hình nhỏ hơn */
 @media (max-width: 1000px) {
-  .screen {
+  .staff {
     width: calc(50% - 10px);
   }
 }
 
 @media (max-width: 500px) {
-  .screen {
+  .staff {
     width: 100%;
+    height: 100%;
   }
 }
 
 .screen--focus {
-  width: 1180px;
+  width: 1080px;
   border: 1px solid red;
 }
 

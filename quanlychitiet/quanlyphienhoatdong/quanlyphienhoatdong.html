@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,26 +12,18 @@
 </head>
 
 <body>
-
-
   <div class="container">
     <!-- thanh header -->
     <div class="header">
       <div>Thông báo</div>
       <div class="search__container">
         <select id="searchOption" class="search__option">
-          <option value="idEmp">Mã nhân viên</option>
-          <option value="name">Nội dung</option>
+          <option value="startTime">Thời gian bắt đầu</option>
+          <option value="endTime">Thời gian kết thúc</option>
         </select>
         <input type="text" name="search" id="search" class="search" placeholder="Nhập nội dùng tìm kiếm">
-        <button class="btn btn--search" onclick="searchNotifi()">Tìm</button>
+        <button class="btn btn--search" onclick="searchSessions()">Tìm</button>
       </div>
-      <select id="chartOption" class="search__option">
-        <option value="emp">Xem theo nhân viên</option>
-        <option value="error">Xem theo lỗi</option>
-      </select>
-      <div style="margin-right: 10px;"></div>
-      <input type="button" class=" btn btn--chart btn--add" id="" value="Xem biểu đồ" onclick="chart()">
     </div>
 
     <!-- container -->
@@ -44,11 +35,9 @@
           <!-- header infor -->
           <thead class="infor__header">
             <tr>
-              <th class="column--action">Hành động</th>
-              <th onclick="sortNotifis('id')" class="column--id">Mã thông báo</th>
-              <th onclick="sortNotifis('idEmp')" class="column--idEmp">Mã nhân viên</th>
-              <th onclick="sortNotifis('content')" class="column--content">Nội dung thông báo</th> <!-- Thêm sự kiện click -->
-
+              <th onclick="sortSessions('startTime')" class="column--idEmp">Thời gian bắt đầu</th>
+              <th onclick="sortSessions('endTime')" class="column--content">Thời gian kết thúc</th>
+              <th class="column--content">Hành động</th>
             </tr>
           </thead>
           <!-- content infor -->
@@ -66,11 +55,8 @@
       <button class= "btn" onclick="exitChart()">Trở lại</button>
     </div>
     
-  <script src="../../callapi.js"></script>
-  <script src="../validateForm.js"></script>
-  <script src="./quanlythongbao.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../../fecthAPI.js"></script>
+  <script src="./quanlyphienhoatdong.js"></script>
+  <script src="./quanlychitietphien.js"></script>
 </body>
-
 </html>

@@ -6,6 +6,16 @@ let remoteVideo;
 let dataChannel;
 let isSocketConnected = false;
 
+function resetPeerConnection() {
+  if (peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+    dataChannel = null;
+    remoteVideo = null;
+  }
+}
+
+
 // Cấu hình ICE servers cho WebRTC
 const configuration = {
   iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
@@ -21,7 +31,7 @@ function connectWebSocket(token) {
   try {
     console.log('Đang kết nối đến WebSocket với token:', token);
 
-    socket = new WebSocket('ws://10.10.49.124:8088/rdp/ws');
+    socket = new WebSocket('ws://10.10.50.115:8088/rdp/ws');
 
     socket.onopen = () => {
       console.log('WebSocket đã kết nối thành công');
@@ -41,10 +51,7 @@ function connectWebSocket(token) {
         switch (data.type) {
           case 'offer':
             handleOffer(data.data.offer);
-            break;
-          case 'answer':
-            handleAnswer(data.data.answer);
-            break;
+            break;  
           case 'ice-candidate':
             handleIceCandidate(data.data['ice-candidate']);
             break;
@@ -87,6 +94,7 @@ function createPeerConnection() {
   // Lắng nghe data channel
   peerConnection.ondatachannel = (event) => {
     dataChannel = event.channel;
+    console.log(event.channel);
     dataChannel.onopen = () => console.log('DataChannel đã mở');
     dataChannel.onclose = () => console.log('DataChannel đã đóng');
   };
@@ -111,7 +119,12 @@ function createPeerConnection() {
 async function handleOffer(offer) {
   console.log('Nhận được offer:', offer);
   try {
-    if (!peerConnection) createPeerConnection();
+    if(!peerConnection) {
+      createPeerConnection();
+    } else {
+      resetPeerConnection();
+      createPeerConnection();
+    }
     await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
@@ -154,14 +167,14 @@ function startShared(id) {
   // Đảm bảo kết nối WebSocket
   connectWebSocket(token);
 
-  connectClient(id);
+  connectClient();
 }
 
 
-function connectClient(id) {
+function connectClient() {
   const interval = setInterval(() => {
     if (isSocketConnected) {
-      sendMessage('start-share-screen', { departmentId: 1 });
+      sendMessage('start-share-screen', { departmentId: 4 });
       console.log('Đã gửi sự kiện start-share-screen');
       clearInterval(interval);
     }

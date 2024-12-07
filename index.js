@@ -1,9 +1,12 @@
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
+
+
+
 var isCall = false;
 const app = {
   screenFocus: function () {
-    const screens = $$('.screen');
+    const screens = $$('.staff');
     screens.forEach(screen => {
       screen.onclick = () => {
         screens.forEach(s => {
@@ -18,6 +21,36 @@ const app = {
         }
       };
     });
+    const btnBack = $('.btn-back')
+    const btnUnFocus = $('.btn-unfocus')
+    btnBack.style.display = 'none'
+    btnUnFocus.style.display = 'block'
+  },
+
+
+  screenUnFocus: function () {
+    const screens = $$('.staff');
+    screens.forEach(screen => {
+      screen.style.display = 'block';
+      screen.classList.remove('screen--focus');
+    });
+
+    if (isCall) {
+      isCall = !isCall;
+    }
+    const btnBack = $('.btn-back')
+    const btnUnFocus = $('.btn-unfocus')
+    btnUnFocus.style.display = 'none'
+    btnBack.style.display = 'block'
+  },
+
+
+  back: function () {
+    renderDepartment();
+    const btnBack = document.querySelector('#btn-back');
+    if (btnBack) {
+      btnBack.style.display = 'none';
+    }
   },
 
   // Hàm thêm màn hình mới
@@ -27,49 +60,36 @@ const app = {
     const screenDiv = document.createElement('div');
     screenDiv.classList.add('screen');
     screenDiv.setAttribute('tabindex', '0');
-    screenDiv.innerHTML = `<video class="screen__img screen__${id}" autoplay playsinline "> </video>`;
+    screenDiv.innerHTML = `<video class="screen__img screen__${id}" autoplay playsinline></video>`;
 
     // Tìm container và thêm màn hình vào trong container
     const container = $('.container');
     if (container) {
       staff.appendChild(screenDiv);
     }
-
-    this.screenFocus(); // Gọi để thiết lập sự kiện cho màn hình mới
+    screenDiv.addEventListener('click', () => app.screenFocus());
+    // this.screenFocus(); // Thiết lập sự kiện cho màn hình mới
     return screenDiv.querySelector('.screen__img'); // Trả về img vừa tạo
   },
 
-  removeScreen: function (id) {
-    // Tìm phần tử màn hình theo id
-    const screen = document.querySelector(`.screen__${id}`);
+  addDepartmentScreen: function (department) {
 
-    if (screen) {
-      // Xóa phần tử screen chứa ảnh
-      const screenDiv = screen.closest('.screen');
-      if (screenDiv) {
-        screenDiv.remove();
-      }
-    }
-  },
-
-  addDepartmentScreen(department) {
     const screenDiv = document.createElement('div');
     screenDiv.classList.add('department', `department_${department.id}`);
     screenDiv.setAttribute('tabindex', '0');
     screenDiv.addEventListener('click', () => renderStaffInDepartment(`${department.id}`));
-    screenDiv.addEventListener('click', () => startShared(`${department.id}`))
+    screenDiv.addEventListener('click', () => startShared(`${department.id}`)); // phát sự kiện yêu cầu chia sẻ
     screenDiv.innerHTML = `
-    <div>
-      <h3>${department.name}</h3>
-    </div>`
+      <div>
+        <h3>${department.name}</h3>
+      </div>`;
     const container = $('.container');
     if (container) {
       container.appendChild(screenDiv);
     }
   },
 
-  addStaffInDepartment(staff) {
-
+  addStaffInDepartment: function (staff) {
     const container = document.querySelector('.container');
     const staffDiv = document.createElement('div');
     staffDiv.classList.add('staff', `staff_${staff.id}`);
@@ -78,7 +98,7 @@ const app = {
     staffDiv.innerHTML = `
       <div class="staff_info">
         <div class="staff_avatar">
-          <img src= "${staff.avatar}" alt="${staff.name}'s Avatar" />
+          <img src="${staff.avatar}" alt="${staff.name}'s Avatar" />
         </div>
         <h3 class="staff_name">${staff.name}</h3>
       </div>`;
@@ -89,16 +109,6 @@ const app = {
       console.error('Container element not found!');
     }
   },
-
-  back() {
-    renderDepartment();
-    document.querySelector('.btn-back').style.display = 'none';
-  },
-
-
-  start: function () {
-    this.screenFocus(); // Thiết lập sự kiện cho các phần tử ban đầu
-  }
 };
 
 // xác thức form đăng nhập 
@@ -188,7 +198,8 @@ async function mainLogout() {
 function renderContent() {
   $('.main-container').innerHTML = `
       <div class="header">
-        <button id="btn-back" class="btn btn-back">Quay lại</button>
+        <button id="btn-back" class="btn btn-back" onclick = "app.back()">Quay lại</button>
+        <button id="btn-unfocus" class="btn btn-unfocus" onclick = "app.screenUnFocus()">Quay lại</button>
         <button id="btn-quanly" class="btn btn-quanly">Quản lý</button>
         <button class="btn btn-logout" onclick="mainLogout()">Đăng xuất</button>
       </div>
@@ -248,30 +259,6 @@ function renderDepartment() {
     {
       "id": 6,
       "name": "Phong F"
-    },
-    {
-      "id": 1,
-      "name": "Phong A"
-    },
-    {
-      "id": 2,
-      "name": "Phong B"
-    },
-    {
-      "id": 3,
-      "name": "Phong C"
-    },
-    {
-      "id": 4,
-      "name": "Phong D"
-    },
-    {
-      "id": 5,
-      "name": "Phong E"
-    },
-    {
-      "id": 6,
-      "name": "Phong F"
     }
   ]
   departments.forEach(department => {
@@ -282,26 +269,24 @@ function renderDepartment() {
 
 
 async function renderStaffInDepartment(id) {
-  const btnBack = document.querySelector('.btn-back');
-  btnBack.style.display = 'block';
-  btnBack.addEventListener('click', () => app.back())
+  console.log('add back trong renderstaffindepartment')
   // const staffs = await fetchStafsfInDepartment('4');
   // console.log(staffs)
   const staffs = [
     {
       "id": 1,
       "name": "nguyen le nhat tuan",
-      "avatar": "https://images.spiderum.com/sp-images/e9fef2d083cf11ea8f996dbfbe6e50b1.jpg"
+      "avatar": "https://scontent.fdad3-5.fna.fbcdn.net/v/t39.30808-6/469116227_887242750255297_1137131770995992515_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHODLj1oGkMNjtRLz1mZG8j9pHEhKyi37f2kcSErKLftwqKHFakRXI63P4p-aCV56SUBw7mmgjwvJ7XvQX8-sGh&_nc_ohc=QLNTQnxpEZoQ7kNvgHOL3Iz&_nc_zt=23&_nc_ht=scontent.fdad3-5.fna&_nc_gid=AuxQKI6PGvTd89b1rri1grN&oh=00_AYAy7KMSiObIBA2j-VbJUuuZ4fYUQXZul7x95hNuy_s6tg&oe=6753372F"
     },
     {
       "id": 2,
       "name": "bao",
-      "avatar": "https://images.spiderum.com/sp-images/e9fef2d083cf11ea8f996dbfbe6e50b1.jpg"
+      "avatar": "https://scontent.fdad3-5.fna.fbcdn.net/v/t39.30808-6/469116227_887242750255297_1137131770995992515_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHODLj1oGkMNjtRLz1mZG8j9pHEhKyi37f2kcSErKLftwqKHFakRXI63P4p-aCV56SUBw7mmgjwvJ7XvQX8-sGh&_nc_ohc=QLNTQnxpEZoQ7kNvgHOL3Iz&_nc_zt=23&_nc_ht=scontent.fdad3-5.fna&_nc_gid=AuxQKI6PGvTd89b1rri1grN&oh=00_AYAy7KMSiObIBA2j-VbJUuuZ4fYUQXZul7x95hNuy_s6tg&oe=6753372F"
     },
     {
       "id": 33,
       "name": "truong",
-      "avatar": "https://images.spiderum.com/sp-images/e9fef2d083cf11ea8f996dbfbe6e50b1.jpg"
+      "avatar": "https://scontent.fdad3-5.fna.fbcdn.net/v/t39.30808-6/469116227_887242750255297_1137131770995992515_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeHODLj1oGkMNjtRLz1mZG8j9pHEhKyi37f2kcSErKLftwqKHFakRXI63P4p-aCV56SUBw7mmgjwvJ7XvQX8-sGh&_nc_ohc=QLNTQnxpEZoQ7kNvgHOL3Iz&_nc_zt=23&_nc_ht=scontent.fdad3-5.fna&_nc_gid=AuxQKI6PGvTd89b1rri1grN&oh=00_AYAy7KMSiObIBA2j-VbJUuuZ4fYUQXZul7x95hNuy_s6tg&oe=6753372F"
     },
 
   ]
@@ -312,6 +297,8 @@ async function renderStaffInDepartment(id) {
   staffs.forEach(staff => {
     app.addStaffInDepartment(staff);
   })
+  const btnBack = $('.btn-back')
+  btnBack.style.display = 'block';
 }
 
 async function fetchDepartments() {
@@ -335,5 +322,15 @@ async function fetchStafsfInDepartment(id) {
 
   } catch (error) {
     console.error('Lỗi khi lấy dữ liệu staff: ', error);
+  }
+}
+
+
+
+function back() {
+  renderDepartment();
+  const btnBack = document.querySelector('#btn-back');
+  if (btnBack) {
+    btnBack.style.display = 'none';
   }
 }

@@ -18,6 +18,7 @@ let sortOrder = 'asc';
 
 // hàm thêm hàng unit 
 function addRowError(data) {
+
   const str = `
     <tr>
       <td class="body__action">
@@ -26,10 +27,9 @@ function addRowError(data) {
         </button>
       </td>
       <td>${data.id}</td>
-      <td>${data.name}</td>
-      <td><input type="checkbox" ${data.isOn === "true" ? "checked" : ""} data-id="${data.id}" onclick="turnOnOrOff('${data.id}')"></td>
-    </tr>
-  `;
+      <td>${data.domain}</td>
+      </tr>
+      `;
   inforBody.innerHTML += str;
 }
 
@@ -37,8 +37,9 @@ function addRowError(data) {
 async function fetchErrors() {
   try {
 
-    errors = await allApi.fetchData('errors');
-    if (errors) {
+    const errorsObj = await allApi.fetchData(`rdp/api/v1/banned-domains/all-banned-domains`);
+    if (errorsObj) {
+      errors = errorsObj.data;
       // Gọi hàm để thêm từng phòng ban vào bảng
       errors.forEach(err => addRowError(err));
     }
@@ -69,10 +70,8 @@ async function addError() {
   clearFormErrors();
   editForm.style.display = "block";
   $('.header__form').textContent = "Thêm lỗi";
-  formId.style.display = 'none';
-  document.querySelector("label[for='id']").style.display = "none";
-  formName.removeAttribute("readonly");
-
+  // formId.style.display = 'none';
+  // document.querySelector("label[for='id']").style.display = "none";
   formName.value = '';
 
   const formValidator = new Validator('#form');
@@ -86,14 +85,13 @@ async function addError() {
       event.preventDefault(); // Ngăn chặn sự kiện gửi đi của form
 
       const newError = {
-        id: uuid.v4(), // Sử dụng uuid để tạo ID mới
-        name: formName.value,
-        isOn: false,
+        domain: formName.value,
       };
 
-      const response = await allApi.addData('errors', newError);
+      const response = await allApi.addData(`rdp/api/v1/banned-domains/banned-domain`, newError);
       if (response) {
-        addRowError(newError);
+        inforBody.innerHTML = '';
+        fetchErrors();
         closeForm();
       }
     } else {
@@ -109,7 +107,7 @@ async function deleteError(button) {
   const isConfirmed = confirm("Bạn có chắc chắn muốn xóa lỗi này?");
 
   if (isConfirmed) {
-    const response = await allApi.deleteData('errors', id);
+    const response = await allApi.deleteData('rdp/api/v1/banned-domains/banned-domain', id);
     if (response) {
       row.remove();
     }
@@ -162,7 +160,7 @@ function searchError() {
   inforBody.innerHTML = '';
 
   const filteredErorr = errors.filter(err => {
-    return err.name.toLowerCase().includes(searchTerm);
+    return err.domain.toLowerCase().includes(searchTerm);
   });
 
   filteredErorr.forEach(err => addRowError(err));

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản lý bộ lỗi</title>
+  <title>Quản lý tên miền bị cấm</title>
   <link rel="stylesheet" href="../quanlychitiet.css">
   <link rel="stylesheet" href="../../fontawesome/fontawesome-free-6.6.0-web/fontawesome-free-6.6.0-web/css/all.min.css">
   <style>
@@ -17,16 +17,16 @@
     <div class="content__form">
       <form action="" method="get" id="form">
         <div>
-          <h2 class="header__form">Thêm quy tắc lỗi</h2>
+          <h2 class="header__form">Thêm miền bị cấm</h2>
         </div>
-        <div class="form__group">
-          <label class="form__label" for="id">Mã Lỗi</label>
+        <!-- <div class="form__group">
+          <label class="form__label" for="id">Mã miền</label>
           <input type="text" class ="form__control" id="id" name="id" readonly>
           <span class="form-message"></span>
-        </div>
+        </div> -->
         <div class="form__group">
-          <label class="form__label" for="name">Tên lỗi</label>
-          <input type="text" class ="form__control" id="name" name="name"  rules = "required" readonly>
+          <label class="form__label" for="name">Tên miền</label>
+          <input type="text" class ="form__control" id="name" name="name"  rules = "required">
           <span class="form-message"></span>
         </div>
         <div class="form__group form__btn">
@@ -60,10 +60,10 @@
           <!-- header infor -->
           <thead class="infor__header">
             <tr>
-              <th class="column--action">Hành động</th>
-              <th onclick="sortError('id')" class="column--id">Mã lỗi</th>
-              <th onclick="sortError('name')" class="column--name">Tên lỗi</th>
-              <th>Trạng thái</th>
+              <th class="column--12">Hành động</th>
+              <th onclick="sortError('id') " class="column--36">Mã miền</th>
+              <th onclick="sortError('domain')">Tên miền</th>
+              <!-- <th>Trạng thái</th> -->
             </tr>
           </thead>
           <!-- content infor -->
@@ -75,7 +75,7 @@
     </div>
   </div>
   
-  <script src="../../callapi.js"></script>
+  <script src="../../fecthAPI.js"></script>
   <script src="../validateForm.js"></script>
   <script src="quanlyloi.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>

@@ -19,20 +19,24 @@
         <div>
           <h2 class="header__form">Thay đổi thông tin nhân viên</h2>
         </div>
-
+        <div class="form__group">
+          <label class="form__label" for="name">Họ và tên</label>
+          <input type="text" class="form__control" id="name" name="name" rules="required">
+          <span class="form-message"></span>
+        </div>
         <div class="form__group">
           <label class="form__label" for="email">Email</label>
-          <input type="email" class="form__control" id="email" name="email" rules="required|email" readonly>
+          <input type="email" class="form__control" id="email" name="email" rules="required|email" >
+          <span class="form-message"></span>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="username">Tên đăng nhập</label>
+          <input type="text" class="form__control" id="username" name="username" rules="required" readonly>
           <span class="form-message"></span>
         </div>
         <div class="form__group">
           <label class="form__label" for="password">Mật khẩu</label>
           <input type="text" class="form__control" id="password" name="password" rules="required|min:6">
-          <span class="form-message"></span>
-        </div>
-        <div class="form__group">
-          <label class="form__label" for="name">Họ và tên</label>
-          <input type="text" class="form__control" id="name" name="name" rules="required" readonly>
           <span class="form-message"></span>
         </div>
         <div class="form__group">
@@ -80,12 +84,13 @@
           <thead class="infor__header">
             <tr>
               <th class="column--12">Hành động</th>
-              <th onclick="sortEmployees('id')" class="column--12">Mã nhân viên</th>
+              <th onclick="sortEmployees('id')" class="column--6">Mã nhân viên</th>
+              <th onclick="sortEmployees('name')" class="column--12">Họ và tên</th> <!-- Thêm sự kiện click -->
               <th onclick="sortEmployees('email')" class="column--24">Email</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('username')" class="column--24">Tên đăng nhập</th> <!-- Thêm sự kiện click -->
               <th onclick="sortEmployees('password')" class="column--24">Mật khẩu</th> <!-- Thêm sự kiện click -->
-              <th onclick="sortEmployees('name')">Họ và tên</th> <!-- Thêm sự kiện click -->
-              <th onclick="sortEmployees('jobTitle')" class="column--12">Công việc</th> <!-- Thêm sự kiện click -->
-              <th onclick="sortEmployees('companyName')" class="column--12">Công ty</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('jobTitle')" class="column--6">Công việc</th> <!-- Thêm sự kiện click -->
+              <th onclick="sortEmployees('companyName')" class="column--6">Công ty</th> <!-- Thêm sự kiện click -->
             </tr>
           </thead>
           <!-- content infor -->

@@ -1,6 +1,7 @@
 
 
-const ipServer = 'http://10.10.49.124:8088/';
+// const ipServer = 'http://10.10.50.115:8088/';
+const ipServer = 'http://192.168.35.12:8088/';
 
 async function fetchAPI(endpoint, options) {
     const url = `${ipServer}${endpoint}`;

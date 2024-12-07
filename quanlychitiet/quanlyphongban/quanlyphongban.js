@@ -163,7 +163,19 @@ function sortDepartments(column) {
 
     let compareA = a[column] || '';
     let compareB = b[column] || '';
-    return (sortOrder === 'asc') ? compareA.localeCompare(compareB) : compareB.localeCompare(compareA);
+    // return (sortOrder === 'asc') ? compareA.localeCompare(compareB) : compareB.localeCompare(compareA);
+
+    if (typeof compareA === 'number' && typeof compareB === 'number') {
+      // Sắp xếp số
+      return (sortOrder === 'asc') ? compareA - compareB : compareB - compareA;
+    } else {
+      // Sắp xếp chuỗi (xử lý undefined/null)
+      const valueA = compareA ? compareA.toString() : '';
+      const valueB = compareB ? compareB.toString() : '';
+      return (sortOrder === 'asc')
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    }
   });
 
   // Xóa nội dung cũ trong bảng

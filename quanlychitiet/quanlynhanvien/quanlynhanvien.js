@@ -15,14 +15,14 @@ const btnHuy = $('.btn--exit');
 
 
 // các trường của form
-const formEmail = document.getElementById("email");
-const formPassword = document.getElementById("password");
 const formName = document.getElementById("name");
+const formEmail = document.getElementById("email");
+const formUsername = document.getElementById("username");
+const formPassword = document.getElementById("password");
 const formJobTitle = document.getElementById("jobTitle");
 const formCompanyName = document.getElementById("companyName");
 
 // Biến toàn cục
-// let departmentsMap = {};
 let employees = [];
 let currentSortColumn = '';
 let sortOrder = 'asc';
@@ -41,9 +41,10 @@ function addRowEmployee(data) {
         </button>
       </td>
       <td>${data.id}</td>
+      <td>${data.name}</td>
       <td>${data.email}</td>
-      <td>${data.password}</td>
       <td>${data.username}</td>
+      <td>${data.password}</td>
       <td>${data.jobTitle}</td> 
       <td>${data.companyName}</td>
     </tr>
@@ -98,14 +99,14 @@ async function addEmployee() {
     if (buttonGroup) {
       return; 
     }
-    if (input && (input.id === 'email' || input.id === 'password')) {
+    if (input && (input.id === 'username' || input.id === 'password')) {
       input.removeAttribute('readonly');
     } else {
       formGroup.remove();
     }
   });
 
-  formEmail.value = '';
+  formUsername.value = '';
   formPassword.value = '';
 
   // Khởi tạo validator chỉ một lần
@@ -124,13 +125,14 @@ async function addEmployee() {
       event.preventDefault(); // Ngăn chặn sự kiện gửi đi của form
 
       const newEmployee = {
-        username: formEmail.value,
+        username: formUsername.value,
         password: formPassword.value,
       };
 
       const employee = await allApi.addData('rdp/api/v1/users/user', newEmployee);
       if(employee) {
-        fetchEmployees()
+        inforBody.innerHTML = ''
+        fetchEmployees();
         closeForm();
       }
 
@@ -148,16 +150,18 @@ async function editEmployee(button) {
 
   const row = button.closest("tr");
   const id = row.cells[1].textContent;
-  const email = row.cells[2].textContent;
-  const password = row.cells[3].textContent;
-  const name = row.cells[4].textContent;
-  const jobTitle = row.cells[5].textContent;
-  const companyName = row.cells[6].textContent;
+  const name = row.cells[2].textContent;
+  const email = row.cells[3].textContent;
+  const username = row.cells[4].textContent;
+  const password = row.cells[5].textContent;
+  const jobTitle = row.cells[6].textContent;
+  const companyName = row.cells[7].textContent;
 
   // Điền dữ liệu vào form
-  formEmail.value = email;
-  formPassword.value = password;
   formName.value = name;
+  formEmail.value = email;
+  formUsername.value = username
+  formPassword.value = password;
   formJobTitle.value = jobTitle;
   formCompanyName.value = companyName;
 
@@ -185,13 +189,8 @@ async function editEmployee(button) {
 
       const data = await allApi.updateData('rdp/api/v1/users/user', id, updatedEmployee);
       if (data) {
-        row.cells[2].textContent = updatedEmployee.name;
-        row.cells[3].textContent = updatedEmployee.email;
-        row.cells[4].textContent = updatedEmployee.password;
-        row.cells[5].textContent = updatedEmployee.part;
-        row.cells[6].textContent = updatedEmployee.position;
-
-        // Đóng form chỉnh sửa
+        inforBody.innerHTML = '';
+        fetchEmployees();
         closeForm();
       }
     } else {
@@ -266,9 +265,21 @@ function sortEmployees(column) {
     const compareB = b[column] || '';
 
     // Sử dụng localeCompare để sắp xếp chuỗi
-    return (sortOrder === 'asc')
-      ? compareA.localeCompare(compareB)
-      : compareB.localeCompare(compareA);
+    // return (sortOrder === 'asc')
+    //   ? compareA.localeCompare(compareB)
+    //   : compareB.localeCompare(compareA);
+
+    if (typeof compareA === 'number' && typeof compareB === 'number') {
+      // Sắp xếp số
+      return (sortOrder === 'asc') ? compareA - compareB : compareB - compareA;
+    } else {
+      // Sắp xếp chuỗi (xử lý undefined/null)
+      const valueA = compareA ? compareA.toString() : '';
+      const valueB = compareB ? compareB.toString() : '';
+      return (sortOrder === 'asc')
+        ? valueA.localeCompare(valueB)
+        : valueB.localeCompare(valueA);
+    }
   });
 
   // Xóa nội dung cũ trong bảng
